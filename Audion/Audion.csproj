@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Ion.Audion</AssemblyName>
+        <RootNamespace>Ion.Audion</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CSCore" Version="1.2.1.2" />
+      <PackageReference Include="PortAudioSharp2" Version="1.0.4" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="3.0.0-preview.4.1" />
+      <PackageReference Include="SkiaSharp.Svg" Version="1.60.0" />
+      <PackageReference Include="StupidSimpleLogger" Version="1.0.8" />
+      <PackageReference Include="Svg.Skia" Version="2.0.0.1" />
+    </ItemGroup>
+
+</Project>
