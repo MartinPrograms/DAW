@@ -187,14 +187,48 @@ public static class InteractionSystem {
         }
         
         elementsUnderMouse = elementsUnderMouse.OrderBy(e => e.Layer).ToList();
-
-        Logger.Info(elementsUnderMouse.Count.ToString());
         
-        if (elementsUnderMouse[0].Position3D == position && elementsUnderMouse[0].Size == size)
+        if (elementsUnderMouse.Count == 0)
         {
-            return true;
+            return false;
+        }
+        
+        var children = RecursiveFindElement(elementsUnderMouse[0]);
+        
+        if (children.Length == 0)
+        {
+            if (MousePosition.X >= position.X && MousePosition.X <= position.X + size.X && MousePosition.Y >= position.Y && MousePosition.Y <= position.Y + size.Y)
+            {
+                return true;
+            }
+        }
+        
+        children = children.OrderBy(e => e.Layer).ToArray();
+        
+        foreach (var child in children)
+        {
+            if (MouseOver(child.Position, child.Size))
+            {
+                return true;
+            }
         }
         
         return false;
+    }
+    
+    private static UIElement[] RecursiveFindElement(UIElement element)
+    {
+        if (element.Children.Count > 0)
+        {
+            foreach (var child in element.Children)
+            {
+                if (MouseOver(child.Position, child.Size))
+                {
+                    return RecursiveFindElement(child);
+                }
+            }
+        }
+        
+        return element.Children.ToArray();
     }
 }
