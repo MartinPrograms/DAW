@@ -33,6 +33,15 @@ public static class WindowManager
             var window = _windows[i];
             
             window.Layer =( _windows.Count - i) * LayerOffset;
+            
+            if (window == _windows[_windows.Count - 1])
+            {
+                window.Focus = true;
+            }
+            else
+            {
+                window.Focus = false;
+            }
         }
     }
 }

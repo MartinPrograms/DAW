@@ -76,6 +76,7 @@ public class Window : UIElement
             InteractionSystem.RemoveInteractiveElement(_bar);
             InteractionSystem.RemoveInteractiveElement(_closeButton);
             InteractionSystem.RemoveInteractiveElement(_minimizeButton);
+            InteractionSystem.RemoveInteractiveElement(_content);
         };
         
         InteractionSystem.AddInteractiveElement(_closeButton);
@@ -91,6 +92,13 @@ public class Window : UIElement
         // Content should be 20 pixels below the bar
         _content = new Square(new Vector2(Position.X, Position.Y + 20), new Vector2(Size.X, Size.Y - 20), new Vector4(1,1,1,1), this.Layer);
         
+        _content.OnDrag = (mousePos, mouseDelta) =>
+        {
+            WantsFocus?.Invoke(this);
+        };
+        
+        InteractionSystem.AddInteractiveElement(_content);
+        
         WindowManager.RegisterWindow(this);
     }
     
@@ -98,9 +106,6 @@ public class Window : UIElement
     {
         if (Visible)
         {
-            if (!Focus)
-                _bar.Color = Color * 0.8f;
-            
             Position = EasingType.OutCubic.Ease(Position, _targetPosition, 6 * Time.DeltaTime);
             
             _bar.Color = Color;
@@ -115,16 +120,26 @@ public class Window : UIElement
             
             _closeButton.Position = new Vector2(Position.X + Size.X - 20, Position.Y); // 0 is top of the window
             _closeButton.Layer = this.Layer - 1;
+            _closeButton.Color = new Vector4(1,0,0,1);
             
             _minimizeButton.Position = new Vector2(Position.X + Size.X - 40, Position.Y); // 0 is top of the window
             _minimizeButton.Layer = this.Layer - 1;
             _minimizeButton.Text = Minimized ? "+" : "-";
+            _minimizeButton.Color = new Vector4(0, 1, 0, 1);
             
             _content.Position = new Vector2(Position.X, Position.Y + 20);
             _content.Size = new Vector2(Size.X, Size.Y - 20);
             _content.Layer = this.Layer - 1;
             _content.FlipY = false;
-            
+
+
+            if (!Focus)
+            {
+                _bar.Color = Color * 0.8f;
+                _minimizeButton.Color = new Vector4(0,1,0,1) * 0.8f;
+                _closeButton.Color = new Vector4(1,0,0,1) * 0.8f;
+            }
+
             List<IRenderable> elements = new ();
             elements.Add(_bar);
             elements.Add(_title);

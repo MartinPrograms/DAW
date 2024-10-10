@@ -31,9 +31,6 @@ var audio = new Audio(44100, 44100); // This is the Audio class, we can play aud
 var audioEngine = new AudioEngine(); // This is the AudioEngine class, this handles everything audio related, apart from playback.
 audio.SetEngine(audioEngine); // Set the audio engine for the audio class.
 
-var kickChannel = new AudioChannel("Kick"); // Every other channel will route to this channel.
-audioEngine.AddChannel(kickChannel);
-
 window.CreateWindow("ION", WindowState.Maximized, VSyncMode.On); // Create a window with the title "ION", maximized, and with VSync on.
 
 window.Load += () =>
@@ -48,7 +45,11 @@ window.Load += () =>
     dropWindow.EnableFileDrop = true;
     dropWindow.OnFileDrop += (files) =>
     {
-        kickChannel.AddEvent(AudioEvent.CreateFromAudioFile(new AudioFile(files[0]), 0));
+        var file = files[0];
+        var a = new AudioChannel(Path.GetFileNameWithoutExtension(file)[..5]);
+        a.AddEvent(AudioEvent.CreateFromAudioFile(new AudioFile(file), audioEngine.Length())); // means they will play after the others
+        
+        audioEngine.AddChannel(a);
     };
     
     queue.Append(dropWindow);

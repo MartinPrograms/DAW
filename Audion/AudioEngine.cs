@@ -8,6 +8,9 @@ public class AudioEngine
     
     List<AudioChannel> channels = new List<AudioChannel>();
     public bool Loop { get; set; } = false;
+
+    public Action<AudioChannel> ChannelAdded { get; set; }
+
     // Length in samples
     public int Length()
     {
@@ -29,6 +32,7 @@ public class AudioEngine
     public void AddChannel(AudioChannel channel)
     {
         channels.Add(channel);
+        ChannelAdded?.Invoke(channel);
     }
     
     public void RemoveChannel(AudioChannel channel)

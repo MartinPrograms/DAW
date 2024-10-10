@@ -24,13 +24,12 @@ public class SampleRack
     private void Initialize()
     {
         _window = new Window(new Vector2(0, 0), new Vector2(400, 200), new Vector4(0.9f, 0.9f, 0.9f, 1), "Sample Rack");
-        
-        foreach (AudioChannel channel in _channels)
+
+        _engine.ChannelAdded += (channel) =>
         {
             var channelInfo = new AudioChannelInfo(channel);
-            
             _window.AddElementRange(channelInfo.Children);
-        }
+        };
     }
 
     public UIElement GetWindow()

@@ -12,6 +12,8 @@ uniform float aspectRatio; // Aspect ratio (width / height) of the screen
 uniform bool flipY;       // Whether to flip the Y axis
 uniform bool ignoreAspectRatio; // Whether to ignore the aspect ratio
 
+uniform vec4 clippingMask; // Clipping mask
+
 void main() {
     vec2 texCoord = TexCoord;
 
@@ -35,6 +37,14 @@ void main() {
     if(result.a < 0.1) {
         discard;
     }
+
+    // Apply the clipping mask, this is a screen-space mask in screen coordinates, so we need to convert it to texture coordinates
+    vec2 maskCoord = gl_FragCoord.xy / resolution;
+
+    if(maskCoord.x < clippingMask.x || maskCoord.x > clippingMask.z || maskCoord.y < clippingMask.y || maskCoord.y > clippingMask.w) {
+        discard;
+    }
+
     result = result * color;
 
     // Output the final color

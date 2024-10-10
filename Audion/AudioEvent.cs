@@ -4,7 +4,7 @@
 public class AudioEvent
 {
     public SampleSegment[] Data { get; private set; }
-    public double StartTime { get; private set; }
+    public double StartTime { get; private set; } // in samples
     public double EndTime { get; private set; }
     public double Duration => EndTime - StartTime;
     
