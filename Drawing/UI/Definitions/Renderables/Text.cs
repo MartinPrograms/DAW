@@ -88,8 +88,8 @@ public class Text : UIElement
         
         
         pos.Y += Padding.Y;
-        
-        Font.RenderText(Content, pos, Color, Layer, Scale, Spacing);
+
+        Font.RenderText(Content, pos, Color, Layer, Scale, Spacing, ClipRect);
 
     }
 }

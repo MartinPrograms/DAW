@@ -30,35 +30,95 @@ public static class InteractionSystem {
         
         var mp = Mouse.Position;
 
-        // Convert mouse position to NDC (normalized device coordinates)
-        // With the origin at the center of the screen
         float ndcX = (2.0f * mp.X) / Resolution.X - 1.0f;
         float ndcY = 1.0f - (2.0f * mp.Y) / Resolution.Y;
         
         Vector4 mouseNDC = new Vector4(ndcX, ndcY, 0.0f, 1.0f);
 
-        // Get the projection, view, and model matrices from the shader manager
         var projectionMatrix = ShaderManager.ProjectionMatrix;
         var viewMatrix = ShaderManager.ViewMatrix;
         var modelMatrix = Matrix4.CreateTranslation(new Vector3(0,0, 0.0f)) * Matrix4.CreateScale(new Vector3(1,-1, 1.0f));
 
-        // Combine all matrices into a single transformation matrix
         var mvpMatrix = modelMatrix * viewMatrix * projectionMatrix;
         
-        // Invert the MVP matrix to get the world position
         var invertedMVP = Matrix4.Invert(mvpMatrix);
         var worldPosition = Vector4.TransformRow(mouseNDC, invertedMVP);
 
-        // Convert to Vector2 since we only care about 2D position (ignore Z)
         MousePosition = new Vector2(worldPosition.X, worldPosition.Y);
         
         MouseDelta = MousePosition - prevMousePosition; // world space delta
         
     }
 
-
-    public static bool MouseOver(Vector2 position, Vector2 size)
+    public static Vector4 ViewToScreen(Vector4 rect)
     {
+        var topLeft = new Vector4(rect.X, rect.Y, 0.0f, 1.0f);
+        var bottomRight = new Vector4(rect.Z, rect.W, 0.0f, 1.0f);
+
+        var projectionMatrix = ShaderManager.ProjectionMatrix;
+        var viewMatrix = ShaderManager.ViewMatrix;
+        var modelMatrix = Matrix4.CreateTranslation(new Vector3(0,0, 0.0f)) * Matrix4.CreateScale(new Vector3(1,-1, 1.0f));
+
+        var mvpMatrix = modelMatrix * viewMatrix * projectionMatrix;
+
+        var ndcTopLeft = Vector4.TransformRow(topLeft, mvpMatrix);
+        var ndcBottomRight = Vector4.TransformRow(bottomRight, mvpMatrix);
+
+        // Convert NDC to screen space
+        var screenTopLeft = new Vector4(
+            ((ndcTopLeft.X + 1.0f) / 2.0f) * Resolution.X,
+            ((1.0f - ndcTopLeft.Y) / 2.0f) * Resolution.Y,
+            0.0f, 1.0f
+        );
+
+        var screenBottomRight = new Vector4(
+            ((ndcBottomRight.X + 1.0f) / 2.0f) * Resolution.X,
+            ((1.0f - ndcBottomRight.Y) / 2.0f) * Resolution.Y,
+            0.0f, 1.0f
+        );
+
+        return new Vector4(screenTopLeft.X, screenTopLeft.Y, screenBottomRight.X, screenBottomRight.Y);
+    }
+
+    public static Vector4 ScreenToView(Vector4 rect)
+    {
+        float ndcX = (2.0f * rect.X) / Resolution.X - 1.0f;
+        float ndcY = 1.0f - (2.0f * rect.Y) / Resolution.Y;
+        
+        Vector4 mouseNDC = new Vector4(ndcX, ndcY, 0.0f, 1.0f);
+
+        var projectionMatrix = ShaderManager.ProjectionMatrix;
+        var viewMatrix = ShaderManager.ViewMatrix;
+        var modelMatrix = Matrix4.CreateTranslation(new Vector3(0,0, 0.0f)) * Matrix4.CreateScale(new Vector3(1,-1, 1.0f));
+
+        var mvpMatrix = modelMatrix * viewMatrix * projectionMatrix;
+        
+        var invertedMVP = Matrix4.Invert(mvpMatrix);
+        var worldPosition = Vector4.TransformRow(mouseNDC, invertedMVP);
+
+        var ndcX2 = (2.0f * rect.Z) / Resolution.X - 1.0f;
+        var ndcY2 = 1.0f - (2.0f * rect.W) / Resolution.Y;
+        
+        Vector4 mouseNDC2 = new Vector4(ndcX2, ndcY2, 0.0f, 1.0f);
+            
+        var worldPosition2 = Vector4.TransformRow(mouseNDC2, invertedMVP);
+        
+        return new Vector4(worldPosition.X, worldPosition.Y, worldPosition2.X, worldPosition2.Y);
+    }
+
+
+    public static bool MouseOver(Vector2 position, Vector2 size, Vector4 clipRect)
+    {
+        if (clipRect != Vector4.Zero)
+        {
+            clipRect = ViewToScreen(clipRect);
+            var inRect = MousePosition.X >= clipRect.X && MousePosition.X <= clipRect.Z && MousePosition.Y >= clipRect.Y && MousePosition.Y <= clipRect.W; // because mouse position is already in world space.
+            if (!inRect)
+            {
+                return false;
+            }
+        }
+        
         return MousePosition.X >= position.X && MousePosition.X <= position.X + size.X && MousePosition.Y >= position.Y && MousePosition.Y <= position.Y + size.Y;
     }
 
@@ -77,116 +137,12 @@ public static class InteractionSystem {
         return Mouse.IsButtonDown(button1);
     }
     
-    public static object GetTopElement()
-    {
-        // Get all elements that are currently being rendered
-        var elements = Window<UIElement>.Instance.GetQueueItems().ToList();
-        if (elements.Count == 0)
-        {
-            return null;
-        }
-        // Find the element that is under the mouse
-        var elementsUnderMouse = elements.Where(e => MouseOver(e.Position, e.Size)).ToList();
-        
-        if (elementsUnderMouse.Count == 0)
-        {
-            return null;
-        }
-        
-        elementsUnderMouse = elementsUnderMouse.OrderBy(e => e.Layer).ToList();
 
-        // We need a recursive function to crawl through the children of the elements
-        var find = elementsUnderMouse[0]; // grab the topmost element 
-        
-        return find;
-    }
-
-    public static UIElement[] GetElementsAtMouse()
-    {
-        var elements = Window<UIElement>.Instance.GetQueueItems().ToList();
-        if (elements.Count == 0)
-        {
-            return new UIElement[0];
-        }
-        
-        var elementsUnderMouse = elements.Where(e => MouseOver(e.Position, e.Size)).ToList();
-        
-        if (elementsUnderMouse.Count == 0)
-        {
-            return new UIElement[0];
-        }
-        
-        return elementsUnderMouse.ToArray();
-    }
-    
-    public static object GetFileDropElement<T> () where T : IRenderable
-    {
-        // Get all elements that are currently being rendered
-        var elements = Window<UIElement>.Instance.GetQueueItems().ToList();
-        if (elements.Count == 0)
-        {
-            return null;
-        }
-        // Find the element that is under the mouse
-        var elementsUnderMouse = elements.Where(e => MouseOver(e.Position, e.Size) && e.EnableFileDrop).ToList();
-        
-        if (elementsUnderMouse.Count == 0)
-        {
-            return null;
-        }
-        
-        elementsUnderMouse = elementsUnderMouse.OrderBy(e => e.Layer).ToList();
-
-        // We need a recursive function to crawl through the children of the elements
-        var find = RecursiveFindElementFileDrop(elementsUnderMouse[0]); // grab the topmost element
-        
-        return find;
-    }
-    
-    public static UIElement RecursiveFindElementFileDrop(UIElement element)
-    {
-        // we must also check that the element is visible, and has the EnableFileDrop property set to true
-        if (element.Children.Count > 0)
-        {
-            foreach (var child in element.Children)
-            {
-                if (MouseOver(child.Position, child.Size) && child.Visible && child.EnableFileDrop)
-                {
-                    return RecursiveFindElementFileDrop(child);
-                }
-            }
-        }
-        
-        return element;
-    }    
-    
-    
-    public static UIElement? MouseOver3D()
-    {
-        var elements = Window<UIElement>.Instance.GetQueueItems().ToList();
-        if (elements.Count == 0)
-        {
-            return null;
-        }
-        
-        var elementsUnderMouse = elements.Where(e => MouseOver(e.Position2D, e.Size)).ToList();
-        
-        if (elementsUnderMouse.Count == 0)
-        {
-            return null;
-        }
-        
-        elementsUnderMouse = elementsUnderMouse.OrderBy(e => e.Layer).ToList();
-
-        var find = elementsUnderMouse[0]; // already top beacuse of the order by layer
-        
-        return find;
-    }
 
     public static bool MouseOver3D(Vector2 position, Vector2 size, int layer) // Z component is layer
     {
         var elements = InteractiveElements;
-        var hoveredElements = elements.Where(e => MouseOver(e.Position2D, e.Size)).ToList();
+        var hoveredElements = elements.Where(e => MouseOver(e.Position2D, e.Size, e.ClipRect)).ToList();
         
         if (hoveredElements.Count == 0)
         {
@@ -197,5 +153,21 @@ public static class InteractionSystem {
         var topElement = hoveredElements.OrderBy(e => e.Layer).ToList()[0];
         
         return topElement.Layer == layer && topElement.Position2D == position && topElement.Size == size;
+    }
+    
+    public static UIElement? MouseOver3D()
+    {
+        var elements = InteractiveElements;
+        var hoveredElements = elements.Where(e => MouseOver(e.Position2D, e.Size, e.ClipRect)).ToList();
+        
+        if (hoveredElements.Count == 0)
+        {
+            return null;
+        }
+        
+        // Get the top most element
+        var topElement = hoveredElements.OrderBy(e => e.Layer).ToList()[0];
+        
+        return topElement;
     }
 }

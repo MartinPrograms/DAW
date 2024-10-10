@@ -6,7 +6,10 @@ in vec2 TexCoord;
 
 uniform sampler2D tex;
 
+uniform vec4 clipRect;
+uniform bool invertClipRect;
 uniform vec4 color;
+uniform vec2 resolution;
 
 void main()
 {
@@ -18,6 +21,26 @@ void main()
     {
         discard;
     }
-    
+
+    vec2 maskCoord = gl_FragCoord.xy / resolution;
+    if (clipRect.x == 0 && clipRect.y == 0 && clipRect.z == 0 && clipRect.w == 0) // if no clipping mask
+    {
+
+    }else 
+    if (maskCoord.x < clipRect.x || maskCoord.x > clipRect.z || maskCoord.y < clipRect.y || maskCoord.y > clipRect.w)
+    {
+        if (!invertClipRect)
+        {
+            fragColor = vec4(0, 255, 0, 255);
+        
+        return;}
+    }
+
+    else if (invertClipRect)
+    {
+        fragColor = vec4(0, 255, 0, 255);
+        return;
+    }
+
     fragColor = texColor * color;
 }

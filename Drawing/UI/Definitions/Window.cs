@@ -19,6 +19,8 @@ public class Window : UIElement
 
     public Action<Window> WantsFocus;
     public bool Focus = false;
+    public Square Content => _content;
+
     public void AddElement(UIElement element)
     {
         element.Layer = this.Layer - 2;

@@ -56,6 +56,8 @@ public class Square : UIElement
         _shader.SetBool("flipY", FlipY);
         _shader.SetFloat("far", InteractionSystem.Far);
         _shader.SetFloat("rotation", Rotation);
+        _shader.SetVector4("clipRect", ClipRect);
+        _shader.SetBool("invertClipRect", InvertClipRect);
 
         _shader.SetBool("ignoreAspectRatio", false);
 

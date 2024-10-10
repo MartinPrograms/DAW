@@ -150,7 +150,7 @@ public class Font : IDisposable
         Logger.Info($"Font '{this.Name}' loaded.");
     }
     
-    public void RenderText(string text, Vector2 position, Vector4 color, int layer = 0, float scale = 1.0f, float spacing = 1.0f)
+    public void RenderText(string text, Vector2 position, Vector4 color, int layer = 0, float scale = 1.0f, float spacing = 1.0f, Vector4 clipRect = default)
     {
         // Render the text.
         
@@ -168,7 +168,10 @@ public class Font : IDisposable
         shader.SetMatrix4("projection", ShaderManager.ProjectionMatrix);
         shader.SetFloat("aspectRatio", InteractionSystem.AspectRatio);
         shader.SetFloat("far", InteractionSystem.Far);
-        
+        shader.SetFloat("rotation", 0);
+        shader.SetVector4("clipRect", clipRect);
+        shader.SetBool("invertClipRect", true);
+
         // Set the resolution.
         shader.SetVector2("resolution", InteractionSystem.Resolution);
         

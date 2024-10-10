@@ -42,15 +42,18 @@ window.Load += () =>
     // All queue elements have an ID, ZIndex, and a Render method.
 
     var dropWindow = new Window(new Vector2(-200, -200), new Vector2(200, 200), new Vector4(0.9f, 0.9f, 0.9f, 1), "Drop audio file here");
-    dropWindow.EnableFileDrop = true;
-    dropWindow.OnFileDrop += (files) =>
+    dropWindow.Content.EnableFileDrop = true;
+    dropWindow.Content.OnFileDrop += (files) =>
     {
         var file = files[0];
         var a = new AudioChannel(Path.GetFileNameWithoutExtension(file)[..5]);
         a.AddEvent(AudioEvent.CreateFromAudioFile(new AudioFile(file), audioEngine.Length())); // means they will play after the others
         
         audioEngine.AddChannel(a);
+        Logger.Info("Added audio channel");
     };
+    
+    InteractionSystem.AddInteractiveElement(dropWindow.Content);
     
     queue.Append(dropWindow);
 

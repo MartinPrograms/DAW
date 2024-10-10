@@ -2,6 +2,8 @@
 using Ion.Audion;
 using Ion.Drawing;
 using Ion.Drawing.UI.Definitions;
+using Ion.Drawing.UI.Definitions.Renderables;
+using StupidSimpleLogger;
 
 namespace DAW_Test.UI;
 
@@ -9,6 +11,7 @@ namespace DAW_Test.UI;
 public class SampleRack
 {
     private Window? _window;
+    private ListBox _listBox;
     
     private AudioChannel[] _channels;
     private AudioEngine _engine;
@@ -24,12 +27,16 @@ public class SampleRack
     private void Initialize()
     {
         _window = new Window(new Vector2(0, 0), new Vector2(400, 200), new Vector4(0.9f, 0.9f, 0.9f, 1), "Sample Rack");
+        _listBox = new ListBox(_window, new Vector2(10, 10), new Vector2(400, 180), new Vector4(0.9f, 0.9f, 0.9f, 1));
+        
+        _engine.ChannelAdded += ChannelAdded;
+        
+        _window.AddElement(_listBox);
+    }
 
-        _engine.ChannelAdded += (channel) =>
-        {
-            var channelInfo = new AudioChannelInfo(channel);
-            _window.AddElementRange(channelInfo.Children);
-        };
+    private void ChannelAdded(AudioChannel obj)
+    {
+        _listBox.AddElement(new Knob("test", new Vector2(0, 0), new Vector2(50, 50), new Vector4(0.9f, 0.9f, 0.9f, 1), 0, -1,1));
     }
 
     public UIElement GetWindow()

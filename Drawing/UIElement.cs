@@ -35,7 +35,9 @@ public abstract class UIElement : IRenderable, IQueueItem
     public Action<string[]> OnFileDrop { get; set; }
     public bool EnableFileDrop { get; set; } = false;
     public List<UIElement> Children { get; set; } = new();
-    
+    public Vector4 ClipRect { get; set; } = Vector4.Zero;
+    public bool InvertClipRect { get; set; } = true;
+
     public bool IsClicked { get; set; }
     public bool IsHovered { get; set; }
     public Vector2 Offset { get; set; } = Vector2.Zero;

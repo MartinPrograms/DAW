@@ -93,12 +93,15 @@ glm::mat4 ortho = glm::ortho(left, right, bottom, top, near, far);
     {
         Logger.Info($"File dropped: {string.Join(", ", obj.FileNames)}");
         FileDropped?.Invoke(obj.FileNames);
-        
+
         // To find the ui element that was dropped on, we need to get all elements currently being rendered, find which one is under the mouse, and find the one with the highest layer.
         // Then we can call the OnFileDrop method of that element.
-        
-        var element = InteractionSystem.GetFileDropElement<T>() as UIElement;
-        element?.OnFileDrop?.Invoke(obj.FileNames);
+
+        var element = InteractionSystem.MouseOver3D();
+        if (element != null)
+            if (element.EnableFileDrop)
+                element?.OnFileDrop?.Invoke(obj.FileNames);
+
     }
 
     private void WindowOnClosing(CancelEventArgs obj)

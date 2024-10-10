@@ -105,6 +105,8 @@ public class Circle : UIElement
         _shader.SetBool("flipY", FlipY);
         _shader.SetBool("ignoreAspectRatio", true);
         _shader.SetFloat("far", InteractionSystem.Far);
+        _shader.SetVector4("clipRect", ClipRect);
+        _shader.SetBool("invertClipRect", InvertClipRect);
 
         var tex = TextureManager.GetTexture(_texture);
 
