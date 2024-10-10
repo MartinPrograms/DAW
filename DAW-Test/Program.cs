@@ -56,8 +56,6 @@ window.Load += () =>
     var channelRack = new SampleRack(audioEngine);
     queue.Append(channelRack.GetWindow());
 
-    var knob = new Knob("Test", new Vector2(100, 100), new Vector2(100, 100), Vector4.One, -10, 0, 1);
-    queue.Append(knob);
 };
 
 window.RegisterHotkey(new[] { Keys.F10 }, () =>

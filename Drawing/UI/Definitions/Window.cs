@@ -63,6 +63,8 @@ public class Window : UIElement
             WantsFocus?.Invoke(this);
         };
         
+        InteractionSystem.AddInteractiveElement(_bar);
+        
         _title = new Text(Title, 1f, HorizontalAlignment.Left, VerticalAlignment.Center, new Vector4(0,0,0,1), this.Layer, new Vector2(5,4));
         _closeButton = new Button("x",new Vector2(Position.X + Size.X - 20, 0), new Vector2(20, 20), new Vector4(1,0,0,1), this.Layer + 1);
         _closeButton.OnClick = () =>
@@ -70,13 +72,21 @@ public class Window : UIElement
             this.Visible = false;
             
             WindowManager.UnregisterWindow(this);
+            
+            InteractionSystem.RemoveInteractiveElement(_bar);
+            InteractionSystem.RemoveInteractiveElement(_closeButton);
+            InteractionSystem.RemoveInteractiveElement(_minimizeButton);
         };
+        
+        InteractionSystem.AddInteractiveElement(_closeButton);
         
         _minimizeButton = new Button("-",new Vector2(Position.X + Size.X - 40, -Position.Y), new Vector2(20, 20), new Vector4(0,1,0,1), this.Layer + 1);
         _minimizeButton.OnClick = () =>
         {
             Minimized = !Minimized;
         };
+        
+        InteractionSystem.AddInteractiveElement(_minimizeButton);
         
         // Content should be 20 pixels below the bar
         _content = new Square(new Vector2(Position.X, Position.Y + 20), new Vector2(Size.X, Size.Y - 20), new Vector4(1,1,1,1), this.Layer);

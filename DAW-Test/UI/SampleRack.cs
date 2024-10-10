@@ -29,7 +29,7 @@ public class SampleRack
         {
             var channelInfo = new AudioChannelInfo(channel);
             
-            _window.AddElementRange(channelInfo.GetElements());
+            _window.AddElementRange(channelInfo.Children);
         }
     }
 

@@ -43,7 +43,8 @@ public class Window<T> where T : IRenderable
         nws.NumberOfSamples = 64; // lol lets blow up the gpu
         
         var ws = maximized.ToOpenTK();
-        nws.WindowState = ws;
+        
+        nws.WindowState = OpenTK.Windowing.Common.WindowState.Minimized;
 
         var gws = GameWindowSettings.Default;
 
@@ -78,6 +79,8 @@ glm::mat4 ortho = glm::ortho(left, right, bottom, top, near, far);
             Logger.Info("Window loaded");
             
             Load?.Invoke();
+            
+            _window.WindowState = ws; 
         };
         _window.RenderFrame += WindowOnRenderFrame;    
         _window.UpdateFrame += WindowOnUpdateFrame;

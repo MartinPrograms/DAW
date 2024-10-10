@@ -39,7 +39,7 @@ public class Knob : UIElement
 
         _background = new Circle(Position, Size, new Vector4(0.5f, 0.5f, 0.5f, 0.2f), this.Layer);
         _knob = new Circle(Position, new Vector2(Size.X / 1.3f, Size.Y / 1.3f), new Vector4(0.5f, 0.5f, 0.5f, 1), this.Layer - 2, "knob");
-        this.OnDrag += (pos, delta) =>
+        OnDrag += (pos, delta) =>
         {
             Logger.Info("Dragging knob");
             
@@ -60,8 +60,11 @@ public class Knob : UIElement
             
             OnChange?.Invoke(_value);
         };
+        // If we don't add something as a child, it will NOT register for events.
         
         _text = new Text(Text, 1f, HorizontalAlignment.Center, VerticalAlignment.Bottom, new Vector4(0, 0, 0, 1), this.Layer - 1, new Vector2(0,7.5f), "small");
+        
+        InteractionSystem.AddInteractiveElement(this);
     }
     
     public override void DoRender()
@@ -82,7 +85,7 @@ public class Knob : UIElement
         _knob.ContentAlignmentVertical = VerticalAlignment.Center;
         
         _text.Position = this.Position2D; // includes padding
-        _text.Layer = this.Layer - 3;
+        _text.Layer = this.Layer - 1;
         _text.Content = this.Text;
         _text.ContentAlignmentHorizontal = HorizontalAlignment.Center;
         _text.ContentAlignmentVertical = VerticalAlignment.Bottom;
@@ -96,6 +99,7 @@ public class Knob : UIElement
         if (IsClicked)
         {
             _knob.Color = Color - new Vector4(0.3f, 0.3f, 0.3f, 0);
+            _background.FlipY = true;
         }
         
         if (this.Visible)

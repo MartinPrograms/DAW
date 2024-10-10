@@ -49,7 +49,7 @@ public abstract class UIElement : IRenderable, IQueueItem
     {
         if (Visible)
         {
-            bool isMouseOver = InteractionSystem.MouseOver3D(Position3D, Size);
+            bool isMouseOver = InteractionSystem.MouseOver3D(this.Position2D, this.Size, Layer);
             
             if (!isMouseOver && IsHovered)
             {

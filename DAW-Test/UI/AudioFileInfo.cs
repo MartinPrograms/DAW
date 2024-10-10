@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace DAW_Test.UI;
 
-public class AudioFileInfo
+public class AudioFileInfo : UIElement
 {
     private Window _window;
     
@@ -57,5 +57,10 @@ public class AudioFileInfo
     public UIElement GetWindow()
     {
         return _window;
+    }
+
+    public override void DoRender()
+    {
+        // Do nothing
     }
 }

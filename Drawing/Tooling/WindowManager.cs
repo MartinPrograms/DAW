@@ -28,11 +28,11 @@ public static class WindowManager
     
     public static void Update()
     {
-        for (int i = 0; i < _windows.Count; i++)
+        for (int i = _windows.Count - 1; i >= 0; i--)
         {
             var window = _windows[i];
             
-            window.Layer = i * LayerOffset;
+            window.Layer =( _windows.Count - i) * LayerOffset;
         }
     }
 }

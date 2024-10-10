@@ -11,6 +11,18 @@ public static class InteractionSystem {
     public static float AspectRatio => (float)Resolution.X / Resolution.Y;
     public static Vector2 MouseDelta;
     public static float Far { get; set; }
+    
+    public static List<UIElement> InteractiveElements = new();
+    
+    public static void AddInteractiveElement(UIElement element)
+    {
+        InteractiveElements.Add(element);
+    }
+    
+    public static void RemoveInteractiveElement(UIElement element)
+    {
+        InteractiveElements.Remove(element);
+    }
 
     public static void Update()
     {
@@ -170,65 +182,20 @@ public static class InteractionSystem {
         
         return find;
     }
-    
-    public static bool MouseOver3D(Vector3 position, Vector2 size)
+
+    public static bool MouseOver3D(Vector2 position, Vector2 size, int layer) // Z component is layer
     {
-        var elements = Window<UIElement>.Instance.GetQueueItems().ToList();
-        if (elements.Count == 0)
+        var elements = InteractiveElements;
+        var hoveredElements = elements.Where(e => MouseOver(e.Position2D, e.Size)).ToList();
+        
+        if (hoveredElements.Count == 0)
         {
             return false;
         }
         
-        var elementsUnderMouse = elements.Where(e => MouseOver(e.Position2D, e.Size)).ToList();
+        // Get the top most element
+        var topElement = hoveredElements.OrderBy(e => e.Layer).ToList()[0];
         
-        if (elementsUnderMouse.Count == 0)
-        {
-            return false;
-        }
-        
-        elementsUnderMouse = elementsUnderMouse.OrderBy(e => e.Layer).ToList();
-        
-        if (elementsUnderMouse.Count == 0)
-        {
-            return false;
-        }
-        
-        var children = RecursiveFindElement(elementsUnderMouse[0]);
-        
-        if (children.Length == 0)
-        {
-            if (MousePosition.X >= position.X && MousePosition.X <= position.X + size.X && MousePosition.Y >= position.Y && MousePosition.Y <= position.Y + size.Y)
-            {
-                return true;
-            }
-        }
-        
-        children = children.OrderBy(e => e.Layer).ToArray();
-        
-        foreach (var child in children)
-        {
-            if (MouseOver(child.Position, child.Size))
-            {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    private static UIElement[] RecursiveFindElement(UIElement element)
-    {
-        if (element.Children.Count > 0)
-        {
-            foreach (var child in element.Children)
-            {
-                if (MouseOver(child.Position, child.Size))
-                {
-                    return RecursiveFindElement(child);
-                }
-            }
-        }
-        
-        return element.Children.ToArray();
+        return topElement.Layer == layer && topElement.Position2D == position && topElement.Size == size;
     }
 }
