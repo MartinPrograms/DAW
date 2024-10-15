@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="DAW/App.axaml" value="DAW/DAW.csproj" />
+        <entry key="DAW/MainView.axaml" value="DAW/DAW.csproj" />
+        <entry key="DAW/MainWindow.axaml" value="DAW/DAW.csproj" />
+        <entry key="DAW/UI/SettingsView.axaml" value="DAW/DAW.csproj" />
+        <entry key="DAW/UI/SettingsWindow.axaml" value="DAW/DAW.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

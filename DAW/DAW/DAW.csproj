@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Eto.Forms" Version="2.8.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Audion\Audion.csproj" />
+    </ItemGroup>
+
+</Project>
