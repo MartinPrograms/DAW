@@ -24,6 +24,7 @@ public class Window : UIElement
     public void AddElement(UIElement element)
     {
         element.Layer = this.Layer - 2;
+        element.Parent = this;
         Children.Add(element);
     }
     
@@ -133,8 +134,7 @@ public class Window : UIElement
             _content.Size = new Vector2(Size.X, Size.Y - 20);
             _content.Layer = this.Layer - 1;
             _content.FlipY = false;
-
-
+            
             if (!Focus)
             {
                 _bar.Color = Color * 0.8f;
@@ -153,8 +153,13 @@ public class Window : UIElement
                 elements.Add(_content);
                 foreach (var element in Children)
                 {
+                    element.Position = new Vector2(Position.X, Position.Y + 20);
                     element.Offset = new Vector2(Position.X, Position.Y + 20);
                     element.Layer = this.Layer - 2;
+                    
+                    element.ClipRect = InteractionSystem.ViewToScreen(new Vector4(Position.X, Position.Y + 20, Position.X + Size.X, Position.Y + Size.Y));
+                    element.InvertClipRect = true;
+                    
                     elements.Add(element);
                 }
             }

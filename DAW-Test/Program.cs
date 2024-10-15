@@ -40,23 +40,7 @@ window.Load += () =>
     // To draw a ui element, we append it to the render queue, and then call window.Render(queue).
     // It does not draw in immediate mode like ImGui, this saves CPU time.
     // All queue elements have an ID, ZIndex, and a Render method.
-
-    var dropWindow = new Window(new Vector2(-200, -200), new Vector2(200, 200), new Vector4(0.9f, 0.9f, 0.9f, 1), "Drop audio file here");
-    dropWindow.Content.EnableFileDrop = true;
-    dropWindow.Content.OnFileDrop += (files) =>
-    {
-        var file = files[0];
-        var a = new AudioChannel(Path.GetFileNameWithoutExtension(file)[..5]);
-        a.AddEvent(AudioEvent.CreateFromAudioFile(new AudioFile(file), audioEngine.Length())); // means they will play after the others
-        
-        audioEngine.AddChannel(a);
-        Logger.Info("Added audio channel");
-    };
     
-    InteractionSystem.AddInteractiveElement(dropWindow.Content);
-    
-    queue.Append(dropWindow);
-
     var channelRack = new SampleRack(audioEngine);
     queue.Append(channelRack.GetWindow());
 
@@ -65,8 +49,8 @@ window.Load += () =>
 window.RegisterHotkey(new[] { Keys.F10 }, () =>
 {
     audioEngine.Reset();
-        
-    var buffer = audioEngine.GetBuffer(44100, 0);
+
+    var buffer = audioEngine.GetBuffer(audioEngine.Length(), 0);
         
     AudioExtensions.WriteAudioToWaveFile(buffer.GetAudioData(), "output.wav");
     Logger.Info("Rendered audio");

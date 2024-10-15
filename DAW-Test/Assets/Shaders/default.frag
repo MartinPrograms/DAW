@@ -40,16 +40,24 @@ void main() {
     }
 
     // Apply the clipping mask in screen space
-    vec2 screenPos = gl_FragCoord.xy / resolution; // Normalize screen position to [0, 1]
+    vec2 screenPos = gl_FragCoord.xy;
+    vec4 rect = clipRect;
 
-    if (clipRect.x == 0 && clipRect.y == 0 && clipRect.z == 0 && clipRect.w == 0) {
-        // No clipping mask, do nothing
-    } else if (screenPos.x < clipRect.x || screenPos.x > clipRect.z || screenPos.y < clipRect.y || screenPos.y > clipRect.w) {
-        if (!invertClipRect) {
-            discard; // Outside the clipping rect, discard the fragment
+    screenPos.y = resolution.y - screenPos.y; // Flip Y axis, because 0,0 is top-left in screen
+
+    if (rect.x == 0 && rect.y == 0 && rect.z == 0 && rect.w == 0) {
+        // No clipping mask
+    }else
+
+    if (invertClipRect) {
+        if (screenPos.x >= rect.x && screenPos.x <= rect.z && screenPos.y >= rect.y && screenPos.y <= rect.w) {
+            discard;
         }
-    } else if (invertClipRect) {
-        discard; // Inside the clipping rect but inverted, discard the fragment
+    }
+    else {
+        if (screenPos.x < rect.x || screenPos.x > rect.z || screenPos.y < rect.y || screenPos.y > rect.w) {
+            discard;
+        }
     }
 
     result *= color;

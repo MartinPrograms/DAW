@@ -13,6 +13,9 @@ uniform vec2 resolution;
 
 void main()
 {
+
+
+
     vec4 texColor = texture(tex, TexCoord);
 
     texColor.a = pow(texColor.a, 2.2);
@@ -22,25 +25,29 @@ void main()
         discard;
     }
 
-    vec2 maskCoord = gl_FragCoord.xy / resolution;
-    if (clipRect.x == 0 && clipRect.y == 0 && clipRect.z == 0 && clipRect.w == 0) // if no clipping mask
-    {
 
-    }else 
-    if (maskCoord.x < clipRect.x || maskCoord.x > clipRect.z || maskCoord.y < clipRect.y || maskCoord.y > clipRect.w)
-    {
-        if (!invertClipRect)
-        {
-            fragColor = vec4(0, 255, 0, 255);
-        
-        return;}
-    }
+    // Apply the clipping mask in screen space
+    vec2 screenPos = gl_FragCoord.xy;
+    screenPos.y = resolution.y - screenPos.y; // Flip Y axis, because 0,0 is top-left in screen
 
-    else if (invertClipRect)
-    {
-        fragColor = vec4(0, 255, 0, 255);
-        return;
+    vec4 rect = clipRect;
+
+
+    if (rect.x == 0 && rect.y == 0 && rect.z == 0 && rect.w == 0) {
+        // No clipping mask
+    }else
+
+    if (!invertClipRect) {
+        if (screenPos.x >= rect.x && screenPos.x <= rect.z && screenPos.y >= rect.y && screenPos.y <= rect.w) {
+            discard;
+        }
     }
+    else {
+        if (screenPos.x < rect.x || screenPos.x > rect.z || screenPos.y < rect.y || screenPos.y > rect.w) {
+            discard;
+        }
+    }
+    
 
     fragColor = texColor * color;
 }

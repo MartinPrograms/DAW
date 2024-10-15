@@ -28,6 +28,9 @@ public class SampleRack
     {
         _window = new Window(new Vector2(0, 0), new Vector2(400, 200), new Vector4(0.9f, 0.9f, 0.9f, 1), "Sample Rack");
         _listBox = new ListBox(_window, new Vector2(10, 10), new Vector2(400, 180), new Vector4(0.9f, 0.9f, 0.9f, 1));
+
+        var testText = new Text("CLIPPING RECT TEXT CLIPPING RECT TEXT CLIPPING RECT TEXT CLIPPING RECT TEXT CLIPPING RECT TEXT ");
+        _listBox.AddElement(testText);
         
         _engine.ChannelAdded += ChannelAdded;
         

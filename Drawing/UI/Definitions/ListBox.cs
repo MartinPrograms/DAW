@@ -32,12 +32,9 @@ public class ListBox : UIElement
         List<IRenderable> elements = new();
 
         Position = Parent!.Position + new Vector2(0, 20);
-        this.ClipRect = InteractionSystem.ViewToScreen(new Vector4(0,0, Size.X, Size.Y));
-        this.InvertClipRect = true; // makes it a mask
         _background.Position = Position;
         _background.Size = Size;
-        _background.ClipRect = ClipRect;
-        _background.InvertClipRect = true;
+        _background.Layer = Layer - 1;
         
         elements.Add(_background);
 
@@ -62,13 +59,14 @@ public class ListBox : UIElement
         
         foreach (var child in Children)
         {
-            child.ClipRect = ClipRect; // So they dont appear outside the listbox
-
-            child.Layer = Layer - 1;
+            child.Layer = Layer - 2;
             child.Visible = true;
             
-            child.Position = child.Position + new Vector2(0, index * xOffset);
+            child.Position = Position + new Vector2(0, index * xOffset);
             child.Size = new Vector2(Size.X, child.Size.Y);
+
+            child.ClipRect = InteractionSystem.ViewToScreen(new Vector4(Position.X, Position.Y, Position.X + Size.X, Position.Y + Size.Y));
+            child.InvertClipRect = true;
             
             elements.Add(child);
             
@@ -84,6 +82,7 @@ public class ListBox : UIElement
     public void AddElement(UIElement item)
     {
         item.Parent = this;
+        item.Layer = Layer - 2;
         Children.Add(item);
     }
 }
