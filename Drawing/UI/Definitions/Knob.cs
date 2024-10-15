@@ -33,6 +33,24 @@ public class Knob : UIElement
         Initialize();
     }
 
+    public Knob(string text, float min, float max, float current)
+    {
+        this.Text = text;
+        this._min = max;
+        this._max = min;
+        
+        Position = new Vector2(0, 0);
+        Size = new Vector2(50, 50);
+        Color = new Vector4(0.8f, .8f, .8f, 1);
+        Layer = 1;
+        
+        _value = current;
+        
+        Initialize();
+        
+        _knob.Rotation = (_value - _min) / (_max - _min) * (_maxRotation - _minRotation) + _minRotation;
+    }
+
     private void Initialize()
     {
         this.Visible = true;
@@ -74,6 +92,9 @@ public class Knob : UIElement
         _background.Size = this.Size;
         _background.Layer = this.Layer - 1;
         _background.FlipY = false;
+
+        _background.ClipRect = ClipRect;
+        _background.InvertClipRect = InvertClipRect;
         
         _knob.Color = Color - new Vector4(0.1f, 0.1f, 0.1f, 0);
         _knob.Position = this.Position2D;
@@ -83,6 +104,8 @@ public class Knob : UIElement
         _knob.Parent = this;
         _knob.ContentAlignmentHorizontal = HorizontalAlignment.Center;
         _knob.ContentAlignmentVertical = VerticalAlignment.Center;
+        _knob.ClipRect = ClipRect;
+        _knob.InvertClipRect = InvertClipRect;
         
         _text.Position = this.Position2D; // includes padding
         _text.Layer = this.Layer - 1;
@@ -90,7 +113,10 @@ public class Knob : UIElement
         _text.ContentAlignmentHorizontal = HorizontalAlignment.Center;
         _text.ContentAlignmentVertical = VerticalAlignment.Bottom;
         _text.Parent = this;
-
+        _text.ClipRect = ClipRect;
+        _text.InvertClipRect = InvertClipRect;
+        
+        
         if (IsHovered)
         {
             _knob.Color = Color + new Vector4(0.1f, 0.1f, 0.1f, 0);

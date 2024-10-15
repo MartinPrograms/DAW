@@ -13,6 +13,7 @@ using FileDropEventArgs = OpenTK.Windowing.Common.FileDropEventArgs;
 
 namespace Ion.Drawing;
 
+[Obsolete("Decided to switch to a premade UI library, because this just isn't worth the time.")]
 public class Window<T> where T : IRenderable
 {
     private GameWindow _window;

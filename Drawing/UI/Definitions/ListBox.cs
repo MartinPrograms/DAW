@@ -20,7 +20,9 @@ public class ListBox : UIElement
         Initialize();
         
     }
-    
+
+    public int Stride { get; set; } = 20;
+
     private void Initialize()
     {
         _background = new Square(Position, Size, Color, Layer);
@@ -48,25 +50,24 @@ public class ListBox : UIElement
             if (Horizontal)
             {
                 child.Position = Position + new Vector2(xOffset, 0);
-                xOffset += (int) child.Size.X;
+                xOffset += (int)child.Size.X + Stride;
             }
             else
             {
                 child.Position = Position + new Vector2(0, yOffset);
-                yOffset += (int) child.Size.Y;
+                yOffset += (int)child.Size.Y + Stride;
             }
         }
         
+        ClipRect = InteractionSystem.ViewToScreen(new Vector4(Position.X, Position.Y, Position.X + Size.X, Position.Y + Size.Y));
+        InvertClipRect = true;
         foreach (var child in Children)
         {
             child.Layer = Layer - 2;
             child.Visible = true;
             
-            child.Position = Position + new Vector2(0, index * xOffset);
-            child.Size = new Vector2(Size.X, child.Size.Y);
-
-            child.ClipRect = InteractionSystem.ViewToScreen(new Vector4(Position.X, Position.Y, Position.X + Size.X, Position.Y + Size.Y));
             child.InvertClipRect = true;
+            child.ClipRect = ClipRect;
             
             elements.Add(child);
             
